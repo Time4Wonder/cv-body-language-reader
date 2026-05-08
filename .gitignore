@@ -9,6 +9,7 @@ __pycache__/
 # ==========================================
 # 2. Virtual Environments
 # ==========================================
+.venv/
 venv/
 env/
 cv-project-env/
@@ -37,6 +38,14 @@ models/
 *.pth
 *.pt
 *.ckpt
+
+# ==========================================
+# 4. Jupyter Notebooks & Logs
+# ==========================================
+.ipynb_checkpoints/
+logs/
+runs/
+tensorboard/
 
 # ==========================================
 # 5. IDEs & Betriebssystem
