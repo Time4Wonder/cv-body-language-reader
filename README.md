@@ -1,4 +1,3 @@
-```markdown
 # Real-Time Body Language Reader
 
 Ein Computer-Vision-Projekt zur echtzeitfähigen Auslesung und Prognose von Mimik und Gestik. Entwickelt im Rahmen einer Projektarbeit an der Technischen Hochschule Deggendorf (THD).
