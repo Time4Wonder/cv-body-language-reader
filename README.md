@@ -52,6 +52,6 @@ body-language-reader/
 
 ## Autoren
 * **Mohammad Samali**
-* **Ed Franck**
+* **Emmanuel Da'si Franck**
 * **Lorenz Burgard**
 
