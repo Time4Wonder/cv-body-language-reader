@@ -1,4 +1,4 @@
-# Real-Time Body Language Reader
+# Real-Time Body Language Reader [WIP]
 
 Ein Computer-Vision-Projekt zur echtzeitfähigen Auslesung und Prognose von Mimik und Gestik. Entwickelt im Rahmen einer Projektarbeit an der Technischen Hochschule Deggendorf (THD).
 
