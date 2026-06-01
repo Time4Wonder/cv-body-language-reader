@@ -1,6 +1,10 @@
 import cv2
 from model_yolo import PoseEstimator
 from face_processor import FaceProcessor
+from model_resnet import ExpressionAnalyzer
+
+# 7 Emotionen aus FER-2013
+EMOTIONEN = ["Wut", "Ekel", "Angst", "Freude", "Trauer", "Überraschung", "Neutral"]
 
 def main():
     """
@@ -9,6 +13,7 @@ def main():
     # 1. Initialisierung der Komponenten
     pose_estimator = PoseEstimator()
     face_processor = FaceProcessor()
+    emotion_analyzer = ExpressionAnalyzer()
     cap = cv2.VideoCapture(0) # Öffnet die Standard-Webcam
 
     print("Programm gestartet. Drücke 'q' zum Beenden.")
@@ -34,7 +39,17 @@ def main():
         # 3. Das Gesicht isolieren und das Rechteck in unser Basis-Bild zeichnen
         face_crop = face_processor.extract_face(frame, keypoints)
         annotated_frame = face_processor.draw(annotated_frame)
-        
+
+        # 4. Emotionen auf dem Gesichts-Crop vorhersagen
+        emotion_text = "Kein Gesicht"
+        if face_crop is not None:
+            class_id, confidence, _ = emotion_analyzer.predict(face_crop)
+            emotion_text = f"{EMOTIONEN[class_id]} ({confidence:.0%})"
+
+        # 5. Emotionen ins Hauptbild zeichnen
+        cv2.putText(annotated_frame, emotion_text, (10, 30),
+                    cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+
         # --- ANZEIGE ---
         
         # Das kombinierte Bild (Skelett + Gesichtsrahmen) anzeigen
