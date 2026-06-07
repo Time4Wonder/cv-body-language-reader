@@ -1,57 +1,104 @@
+
 import cv2
+import json
 from model_yolo import PoseEstimator
 from face_processor import FaceProcessor
-
+from temporal_tracker import TemporalTracker
+from temporal_aggregator import TemporalAggregator
+ 
+ 
 def main():
     """
-    Hauptprogramm: Orchestriert die Kamera, die Pose-Schätzung und die Gesichts-Isolierung.
+    Hauptprogramm: Orchestriert die Kamera, die Pose-Schätzung, die
+    Gesichts-Isolierung, das zeitliche Tracking und die zeitliche Aggregation.
     """
     # 1. Initialisierung der Komponenten
     pose_estimator = PoseEstimator()
     face_processor = FaceProcessor()
-    cap = cv2.VideoCapture(0) # Öffnet die Standard-Webcam
-
+    temporal_tracker = TemporalTracker()
+    temporal_aggregator = TemporalAggregator(window_seconds=10.0)
+    cap = cv2.VideoCapture(0)  # Öffnet die Standard-Webcam
+ 
+    image_size_set = False  # Bildgröße erst nach dem ersten Frame bekannt
+ 
     print("Programm gestartet. Drücke 'q' zum Beenden.")
-
+ 
     while True:
         # Bild von der Kamera lesen
         ret, frame = cap.read()
         if not ret:
             print("Fehler: Kamera konnte nicht gelesen werden.")
             break
-        
-        
-        # 1. Pose-Scheatzung durchführen
+ 
+        # Bildgröße einmalig setzen (für die Bewegungs-Normalisierung auf [0,1])
+        if not image_size_set:
+            h, w, _ = frame.shape
+            temporal_aggregator.set_image_size(w, h)
+            image_size_set = True
+ 
+        # 1. Pose-Schätzung durchführen
         results = list(pose_estimator.estimate(frame))
         keypoints = pose_estimator.extract_keypoints(results)
-        
+ 
         # 2. Das Basis-Bild mit dem YOLO-Skelett erstellen
         # Wir nutzen 'annotated_frame' als unsere Zeichenfläche
         annotated_frame = pose_estimator.draw(results)
         if annotated_frame is None:
             annotated_frame = frame.copy()
-
+ 
         # 3. Das Gesicht isolieren und das Rechteck in unser Basis-Bild zeichnen
         face_crop = face_processor.extract_face(frame, keypoints)
         annotated_frame = face_processor.draw(annotated_frame)
-        
+ 
+        # 4. Zeitliche Analyse (Kalman-Tracking)
+        motion_state = temporal_tracker.update(keypoints)
+        annotated_frame = temporal_tracker.draw(annotated_frame, motion_state)
+ 
+        # 5. Zeitliche Aggregation (Scores über die Periode)
+        # Bewegung = die schnellere der beiden Hände (px/frame)
+        left_speed = motion_state["left_wrist"]["speed"]
+        right_speed = motion_state["right_wrist"]["speed"]
+        motion_speed = max(left_speed, right_speed)
+ 
+        # Emotionen: Platzhalter "neutral", bis das CNN aus Phase 2 existiert.
+        # Reihenfolge: [angry, disgust, fear, happy, neutral, sad, surprise]
+        # Später ersetzen durch:  emotion_probs = face_cnn.predict(face_crop)
+        emotion_probs = [0, 0, 0, 0, 1, 0, 0]
+ 
+        temporal_aggregator.add_frame(emotion_probs, motion_speed)
+ 
         # --- ANZEIGE ---
-        
+ 
         # Das kombinierte Bild (Skelett + Gesichtsrahmen) anzeigen
         cv2.imshow("Detection Overview", annotated_frame)
-        
+ 
         # Den isolierten Gesichts-Ausschnitt in einem separaten Fenster zeigen
         if face_crop is not None:
             cv2.imshow("Face Crop (Model Input)", face_crop)
-        
+ 
         # Abbruchbedingung: 'q' Taste
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
-
+ 
     # Ressourcen sauber freigeben
     cap.release()
     cv2.destroyAllWindows()
+ 
+    # 6. Abschlussbericht: aggregierte Scores über die gesamte Session
+    report = temporal_aggregator.get_report()
+    session = report["session"]
+    if session is not None:
+        print("\n=== Zusammenfassung der Session ===")
+        print(f"Dauer: {session['duration_s']}s, Frames: {session['n_frames']}")
+        print(f"Dominante Emotion: {session['dominant_emotion']}")
+        print("Scores pro Emotion [0,1]:")
+        print(json.dumps(session["emotion_scores"], indent=2))
+        print(f"Bewegung (roh): {session['motion']['speed_raw']} px/frame")
+    else:
+        print("\nKeine Daten aufgezeichnet.")
+ 
     print("Programm beendet.")
-
+ 
+ 
 if __name__ == "__main__":
     main()
