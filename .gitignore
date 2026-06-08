@@ -5,7 +5,7 @@ __pycache__/
 *.py[cod]
 *$py.class
 *.so
-
+pyrightconfig.json
 # ==========================================
 # 2. Virtual Environments
 # ==========================================
