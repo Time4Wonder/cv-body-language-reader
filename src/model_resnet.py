@@ -9,7 +9,7 @@ class ExpressionAnalyzer:
     # Lädt ein vortrainiertes ResNet18 und ersetzt den Kopf durch 7 Emotionen
     def __init__(self, num_classes=7):
         self.model = models.resnet18(weights="DEFAULT")
-        in_features = self.model.fc.in_features
+        in_features = self.model.fc.in_features # Head entfernen
         self.model.fc = nn.Linear(in_features, num_classes)
         self.model.eval()
 
