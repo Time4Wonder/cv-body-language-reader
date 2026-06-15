@@ -44,4 +44,4 @@ for epoch in range(EPOCHS):
         running_loss += loss.item()
 
     avg_loss = running_loss / len(train_loader)
-    pritn(f"Epoche {epoch+1}/{EPOCHS}, Loss: {avg_loss:.4f}")
+    print(f"Epoche {epoch+1}/{EPOCHS}, Loss: {avg_loss:.4f}")
