@@ -2,6 +2,8 @@ import torch
 import torch.nn as nn
 from torchvision import models
 from src.dataset import get_dataloaders
+import os
+
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
 # Params:
@@ -45,3 +47,8 @@ for epoch in range(EPOCHS):
 
     avg_loss = running_loss / len(train_loader)
     print(f"Epoche {epoch+1}/{EPOCHS}, Loss: {avg_loss:.4f}")
+
+os.makedirs("models", exist_ok=True)
+torch.save(model.state_dict(), "models/resnet_fer2013.pth")
+print("Gespeichert unter models/resnet_fer2013.pth")
+
