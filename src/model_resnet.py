@@ -7,11 +7,16 @@ import torchvision.transforms as transforms
 
 class ExpressionAnalyzer:
     # Lädt ein vortrainiertes ResNet18 und ersetzt den Kopf durch 7 Emotionen
-    def __init__(self, num_classes=7):
-        self.model = models.resnet18(weights="")
+    def __init__(self, num_classes=7, model_path=None):
+        self.model = models.resnet18(weights="DEFAULT")
         in_features = self.model.fc.in_features # Head entfernen
         self.model.fc = nn.Linear(in_features, num_classes)
         self.model.eval()
+        
+        if model_path: 
+            self.model.load_state_dict(torch.load(model_path, map_location="cpu"))
+            self.model.eval()
+
 
     # Wandelt ein OpenCV-BGR-Bild in einen normalisierten Tensor um (1, 3, 224, 224)
     def preprocess(self, face_crop):

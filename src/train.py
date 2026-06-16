@@ -48,6 +48,23 @@ for epoch in range(EPOCHS):
     avg_loss = running_loss / len(train_loader)
     print(f"Epoche {epoch+1}/{EPOCHS}, Loss: {avg_loss:.4f}")
 
+# Validation Part:
+correct = 0
+total = 0 
+
+model.eval()
+for images, labels in test_loader:
+    images = images.to(device)
+    labels = labels.to(device)
+    logits = model(images)
+    predictions = torch.argmax(logits, dim=1)
+    correct += (predictions == labels).sum().item()
+    total += labels.size(0)
+
+accuracy = correct/ total * 100
+print(f"Accuracy: {accuracy}")
+
+
 os.makedirs("models", exist_ok=True)
 torch.save(model.state_dict(), "models/resnet_fer2013.pth")
 print("Gespeichert unter models/resnet_fer2013.pth")

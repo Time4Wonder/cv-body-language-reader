@@ -1,10 +1,10 @@
 import cv2
-from model_yolo import PoseEstimator
-from face_processor import FaceProcessor
-from model_resnet import ExpressionAnalyzer
+from src.model_yolo import PoseEstimator
+from src.face_processor import FaceProcessor
+from src.model_resnet import ExpressionAnalyzer
 
 # 7 Emotionen aus FER-2013
-EMOTIONEN = ["Wut", "Ekel", "Angst", "Freude", "Trauer", "Überraschung", "Neutral"]
+EMOTIONEN = ["angry", "disgust", "fear", "happy", "neutral", "sad", "surprise"]
 
 def main():
     """
@@ -13,7 +13,7 @@ def main():
     # 1. Initialisierung der Komponenten
     pose_estimator = PoseEstimator()
     face_processor = FaceProcessor()
-    emotion_analyzer = ExpressionAnalyzer()
+    emotion_analyzer = ExpressionAnalyzer(model_path="models/resnet_fer2013.pth")
     cap = cv2.VideoCapture(0) # Öffnet die Standard-Webcam
 
     print("Programm gestartet. Drücke 'q' zum Beenden.")
