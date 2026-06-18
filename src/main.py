@@ -1,7 +1,7 @@
 import cv2
-from src.model_yolo import PoseEstimator
-from src.face_processor import FaceProcessor
-from src.model_resnet import ExpressionAnalyzer
+from model_yolo import PoseEstimator
+from face_processor import FaceProcessor
+from model_resnet import ExpressionAnalyzer
 
 # 7 Emotionen aus FER-2013
 EMOTIONEN = ["angry", "disgust", "fear", "happy", "neutral", "sad", "surprise"]
