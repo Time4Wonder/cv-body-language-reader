@@ -1,3 +1,4 @@
+from cv2.gapi import threshold
 import numpy as np
 
 
@@ -70,6 +71,15 @@ class BodyMovementAnalyzer:
 
         return normalized_keypoints
 
+
+    def _apply_deadzone(self, value, threshold=0.03):
+        """
+        Entfernt sehr kleine Bewegungen, die meistens durch YOLO-Rauschen entstehen.
+        """
+        if value < threshold:
+            return 0.0
+        return value
+    
     def calculate(self, keypoints):
         """
         Berechnet getrennt die Körperbewegung und die Handbewegung.
@@ -110,13 +120,13 @@ class BodyMovementAnalyzer:
         hand_indices = [9, 10]
         
         # Durchschnittliche Kopfbewegung berechnen
-        head_movement = np.mean(distances[head_indices])
+        head_movement = self._apply_deadzone(np.mean(distances[head_indices]), 0.07)
 
         # Durchschnittliche Körperbewegung berechnen
-        body_movement = np.mean(distances[body_indices])
+        body_movement = self._apply_deadzone(np.mean(distances[body_indices]), 0.03)
 
         # Durchschnittliche Handbewegung berechnen
-        hand_movement = np.mean(distances[hand_indices])
+        hand_movement = self._apply_deadzone(np.mean(distances[hand_indices]), 0.02)
 
         # Werte auf 0 bis 1 normieren
         head_value = np.clip(head_movement / self.max_head_movement, 0.0, 1.0)
@@ -145,3 +155,4 @@ class BodyMovementAnalyzer:
             float(self.hand_intensity),
             float(self.head_intensity)
         )
+    
