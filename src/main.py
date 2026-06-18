@@ -1,7 +1,7 @@
 import cv2
 from model_yolo import PoseEstimator
 from face_processor import FaceProcessor
-from model_yolo import PoseEstimator, MovementAnalyzer, GestureAnalyzer
+from BodyMovementAnalyzer import BodyMovementAnalyzer
 
 def main():
     """
@@ -10,8 +10,7 @@ def main():
     # 1. Initialisierung der Komponenten
     pose_estimator = PoseEstimator()
     face_processor = FaceProcessor()
-    movement_analyzer = MovementAnalyzer()
-    gesture_analyzer = GestureAnalyzer()
+    body_movement_analyzer = BodyMovementAnalyzer()
     
     cap = cv2.VideoCapture(0) # Öffnet die Standard-Webcam
 
@@ -32,14 +31,8 @@ def main():
         keypoints = pose_estimator.extract_keypoints(results)
         
         # Bewegungsintensität berechnen
-        movement_intensity = movement_analyzer.calculate_movement_intensity(keypoints)
-
-        # Geste erkennen
-        gesture = gesture_analyzer.analyze(keypoints)
-
-        # Geste in numerische Features umwandeln
-        gesture_features = gesture_analyzer.encode(gesture)
-
+        body_movement, hand_movement, head_movement = body_movement_analyzer.calculate(keypoints)
+    
         # 2. Das Basis-Bild mit dem YOLO-Skelett erstellen
         # Wir nutzen 'annotated_frame' als unsere Zeichenfläche
         annotated_frame = pose_estimator.draw(results)
@@ -53,21 +46,20 @@ def main():
         
         # --- ANZEIGE ---
         
+        # Bewegungsintensität anzeigen
+        cv2.putText(annotated_frame, f"Body Movement: {body_movement:.2f}",
+            (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 255), 2)
+
+        cv2.putText(annotated_frame, f"Hand Movement: {hand_movement:.2f}",
+            (10, 90), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 0), 2)
+
+        cv2.putText(annotated_frame, f"Head Movement: {head_movement:.2f}",
+            (10, 120), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 0, 255), 2)
+        
+        
         # Das kombinierte Bild (Skelett + Gesichtsrahmen) anzeigen
         cv2.imshow("Detection Overview", annotated_frame)
-        # Bewegungsintensität anzeigen
-        cv2.putText(
-    annotated_frame,
-    f"Movement Intensity: {movement_intensity:.2f}",
-    (30, 50),
-    cv2.FONT_HERSHEY_SIMPLEX,
-    1,
-    (0, 255, 0),
-    2
-)
-
-        # Erkannte Geste anzeigen
-        cv2.putText(annotated_frame,f"Gesture: {gesture}",(20, 60),cv2.FONT_HERSHEY_SIMPLEX,0.6,(0, 255, 0),1)
+        
         # Den isolierten Gesichts-Ausschnitt in einem separaten Fenster zeigen
         if face_crop is not None:
             cv2.imshow("Face Crop (Model Input)", face_crop)
