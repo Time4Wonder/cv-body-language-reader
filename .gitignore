@@ -1,0 +1,61 @@
+# ==========================================
+# 1. Python & Byte-compiled files
+# ==========================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# ==========================================
+# 2. Virtual Environments
+# ==========================================
+.venv/
+venv/
+env/
+cv-project-env/
+.env
+
+# ==========================================
+# 3. Machine Learning: Daten & Modelle
+# ==========================================
+# Ignoriere alle Rohdaten und verarbeiteten Daten
+data/raw/
+data/processed/
+*.csv
+*.zip
+*.tar.gz
+*.tar
+
+# Ignoriere Bilder und Videos (falls sie lose im Repo liegen)
+*.jpg
+*.jpeg
+*.png
+*.mp4
+*.avi
+
+# PyTorch Modell-Gewichte und Checkpoints
+models/
+*.pth
+*.pt
+*.ckpt
+
+# ==========================================
+# 4. Jupyter Notebooks & Logs
+# ==========================================
+.ipynb_checkpoints/
+logs/
+runs/
+tensorboard/
+
+# ==========================================
+# 5. IDEs & Betriebssystem
+# ==========================================
+# VS Code
+.vscode/
+
+# PyCharm / IntelliJ
+.idea/
+
+# macOS / Linux Systemdateien
+.DS_Store
+*~
