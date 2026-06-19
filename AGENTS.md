@@ -18,10 +18,12 @@ MovementAnalyzer, GestureAnalyzer, FeatureFusion (import bug — see below)
 - `src/spatial_analysis/` — ResNet emotion model, dataset loader, training
 - `src/temporal_analysis/` — Kalman tracking, temporal aggregator, RelativeMotionAnalyzer
 - `src/tracking_features/` — YOLO pose estimator, face extraction
-- `src/output/` — LiveChart matplotlib visualization
+- `src/output/` — LiveChart matplotlib visualization, BehaviorInterpreter
 
 Pipeline:
-`Webcam → YOLO pose → face crop → ResNet emotions + Kalman tracking → RelativeMotionAnalyzer → temporal aggregation → session report`
+`Webcam → YOLO pose → face crop → ResNet emotions + Kalman tracking → RelativeMotionAnalyzer → temporal aggregation + behavior interpretation → session report`
+
+BehaviorInterpreter: 7×3 Matrix (Emotion × Speed-Level → deutsches Verhaltenslabel). Eigenes OpenCV-Fenster `"Behavior Interpretation"` mit Label, Emotion, Speed-Balken, Alternativen.
 
 RelativeMotionAnalyzer: Handgeschwindigkeit relativ zum Gesichtszentrum (Kopfbreite als Einheit) → [0,1], invariant gegen Kamerabewegung und Distanz.
 
