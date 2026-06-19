@@ -5,6 +5,7 @@ from tracking_features.face_processor import FaceProcessor
 from spatial_analysis.model_resnet import ExpressionAnalyzer
 from temporal_analysis.temporal_tracker import TemporalTracker
 from temporal_analysis.temporal_aggregator import TemporalAggregator
+from temporal_analysis.relative_motion import RelativeMotionAnalyzer
 from output.live_chart import LiveChart
 
 # 7 Emotionen aus FER-2013
@@ -22,6 +23,7 @@ def main():
     emotion_analyzer = ExpressionAnalyzer(model_path="models/resnet_fer2013.pth")
     temporal_tracker = TemporalTracker()
     temporal_aggregator = TemporalAggregator(window_seconds=10.0)
+    relative_motion = RelativeMotionAnalyzer()
     live_chart = LiveChart()
     cap = cv2.VideoCapture(0)  # Öffnet die Standard-Webcam
 
@@ -72,14 +74,11 @@ def main():
         motion_state = temporal_tracker.update(keypoints)
         annotated_frame = temporal_tracker.draw(annotated_frame, motion_state)
 
-        # 7. Zeitliche Aggregation (Scores über die Periode)
-        # Bewegung = die schnellere der beiden Hände (px/frame)
-        left_speed = motion_state["left_wrist"]["speed"]
-        right_speed = motion_state["right_wrist"]["speed"]
-        motion_speed = max(left_speed, right_speed)
+        # 7. Relative Handbewegung (Kalman-gefiltert, relativ zum Gesicht, [0,1])
+        rel_speed = relative_motion.compute(motion_state, keypoints)
 
-        temporal_aggregator.add_frame(emotion_probs, motion_speed)
-        live_chart.add_frame(emotion_probs, temporal_aggregator.normalize_speed(motion_speed))
+        temporal_aggregator.add_frame(emotion_probs, rel_speed)
+        live_chart.add_frame(emotion_probs, rel_speed)
 
         # --- ANZEIGE ---
 
