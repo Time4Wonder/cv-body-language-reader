@@ -16,12 +16,14 @@ MovementAnalyzer, GestureAnalyzer, FeatureFusion (import bug — see below)
 
 `src/main.py` is the single entrypoint. Subdirectories:
 - `src/spatial_analysis/` — ResNet emotion model, dataset loader, training
-- `src/temporal_analysis/` — Kalman tracking, temporal aggregator
+- `src/temporal_analysis/` — Kalman tracking, temporal aggregator, RelativeMotionAnalyzer
 - `src/tracking_features/` — YOLO pose estimator, face extraction
 - `src/output/` — LiveChart matplotlib visualization
 
 Pipeline:
-`Webcam → YOLO pose → face crop → ResNet emotions + Kalman tracking → temporal aggregation → session report`
+`Webcam → YOLO pose → face crop → ResNet emotions + Kalman tracking → RelativeMotionAnalyzer → temporal aggregation → session report`
+
+RelativeMotionAnalyzer: Handgeschwindigkeit relativ zum Gesichtszentrum (Kopfbreite als Einheit) → [0,1], invariant gegen Kamerabewegung und Distanz.
 
 Keypoints (COCO): nose=0, left_ear=3, right_ear=4, left_wrist=9, right_wrist=10
 
