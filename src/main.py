@@ -5,6 +5,7 @@ from face_processor import FaceProcessor
 from model_resnet import ExpressionAnalyzer
 from temporal_tracker import TemporalTracker
 from temporal_aggregator import TemporalAggregator
+from live_chart import LiveChart
 
 # 7 Emotionen aus FER-2013
 EMOTIONEN = ["angry", "disgust", "fear", "happy", "neutral", "sad", "surprise"]
@@ -21,6 +22,7 @@ def main():
     emotion_analyzer = ExpressionAnalyzer(model_path="models/resnet_fer2013.pth")
     temporal_tracker = TemporalTracker()
     temporal_aggregator = TemporalAggregator(window_seconds=10.0)
+    live_chart = LiveChart()
     cap = cv2.VideoCapture(0)  # Öffnet die Standard-Webcam
 
     image_size_set = False  # Bildgröße erst nach dem ersten Frame bekannt
@@ -77,6 +79,7 @@ def main():
         motion_speed = max(left_speed, right_speed)
 
         temporal_aggregator.add_frame(emotion_probs, motion_speed)
+        live_chart.add_frame(emotion_probs, temporal_aggregator.normalize_speed(motion_speed))
 
         # --- ANZEIGE ---
 
@@ -108,6 +111,7 @@ def main():
     else:
         print("\nKeine Daten aufgezeichnet.")
 
+    live_chart.close()
     print("Programm beendet.")
 
 

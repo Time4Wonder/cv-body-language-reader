@@ -116,6 +116,12 @@ class TemporalAggregator:
             self._current_slice = _WindowAccumulator()
             self._slice_start_t = timestamp
 
+    def normalize_speed(self, raw_speed):
+        """Wandelt px/frame → [0,1] normalisiert anhand der Bild-Diagonale."""
+        if self.image_diagonal:
+            return min(float(raw_speed) / self.image_diagonal, 1.0)
+        return 0.0
+
     def get_slices(self, include_current=True):
         """
         Gib die Zeit-Slice-Ergebnisse.
