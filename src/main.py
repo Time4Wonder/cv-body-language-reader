@@ -79,7 +79,7 @@ def main():
         motion_speed = max(left_speed, right_speed)
 
         temporal_aggregator.add_frame(emotion_probs, motion_speed)
-        live_chart.add_frame(emotion_probs, motion_speed)
+        live_chart.add_frame(emotion_probs, temporal_aggregator.normalize_speed(motion_speed))
 
         # --- ANZEIGE ---
 
