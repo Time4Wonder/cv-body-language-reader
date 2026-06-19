@@ -7,6 +7,7 @@ from temporal_analysis.temporal_tracker import TemporalTracker
 from temporal_analysis.temporal_aggregator import TemporalAggregator
 from temporal_analysis.relative_motion import RelativeMotionAnalyzer
 from output.live_chart import LiveChart
+from output.behavior_interpreter import BehaviorInterpreter
 
 # 7 Emotionen aus FER-2013
 EMOTIONEN = ["angry", "disgust", "fear", "happy", "neutral", "sad", "surprise"]
@@ -24,10 +25,12 @@ def main():
     temporal_tracker = TemporalTracker()
     temporal_aggregator = TemporalAggregator(window_seconds=10.0)
     relative_motion = RelativeMotionAnalyzer()
+    behavior_interpreter = BehaviorInterpreter()
     live_chart = LiveChart()
     cap = cv2.VideoCapture(0)  # Öffnet die Standard-Webcam
 
     image_size_set = False  # Bildgröße erst nach dem ersten Frame bekannt
+    behavior_speeds = []    # rel_speed-Werte für Session-Report
 
     print("Programm gestartet. Drücke 'q' zum Beenden.")
 
@@ -77,6 +80,10 @@ def main():
         # 7. Relative Handbewegung (Kalman-gefiltert, relativ zum Gesicht, [0,1])
         rel_speed = relative_motion.compute(motion_state, keypoints)
 
+        behavior_result = behavior_interpreter.interpret(emotion_probs, rel_speed)
+        behavior_canvas = behavior_interpreter.render_canvas(behavior_result)
+
+        behavior_speeds.append(rel_speed)
         temporal_aggregator.add_frame(emotion_probs, rel_speed)
         live_chart.add_frame(emotion_probs, rel_speed)
 
@@ -88,6 +95,8 @@ def main():
         # Den isolierten Gesichts-Ausschnitt in einem separaten Fenster zeigen
         if face_crop is not None:
             cv2.imshow("Face Crop (Model Input)", face_crop)
+
+        cv2.imshow("Behavior Interpretation", behavior_canvas)
 
         # Abbruchbedingung: 'q' Taste
         if cv2.waitKey(1) & 0xFF == ord('q'):
@@ -107,6 +116,10 @@ def main():
         print("Scores pro Emotion [0,1]:")
         print(json.dumps(session["emotion_scores"], indent=2))
         print(f"Bewegung (roh): {session['motion']['speed_raw']} px/frame")
+        avg_speed = sum(behavior_speeds) / len(behavior_speeds) if behavior_speeds else 0
+        avg_probs = [session["emotion_scores"][e] for e in EMOTIONEN]
+        session_behavior = behavior_interpreter.interpret(avg_probs, avg_speed)
+        print(f"Dominantes Verhalten: {session_behavior['label']}")
     else:
         print("\nKeine Daten aufgezeichnet.")
 
