@@ -1,11 +1,11 @@
 import cv2
 import json
-from model_yolo import PoseEstimator
-from face_processor import FaceProcessor
-from model_resnet import ExpressionAnalyzer
-from temporal_tracker import TemporalTracker
-from temporal_aggregator import TemporalAggregator
-from live_chart import LiveChart
+from tracking_features.model_yolo import PoseEstimator
+from tracking_features.face_processor import FaceProcessor
+from spatial_analysis.model_resnet import ExpressionAnalyzer
+from temporal_analysis.temporal_tracker import TemporalTracker
+from temporal_analysis.temporal_aggregator import TemporalAggregator
+from output.live_chart import LiveChart
 
 # 7 Emotionen aus FER-2013
 EMOTIONEN = ["angry", "disgust", "fear", "happy", "neutral", "sad", "surprise"]

@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 from torchvision import models
-from src.dataset import get_dataloaders
+from dataset import get_dataloaders
 import os
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
