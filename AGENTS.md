@@ -32,7 +32,8 @@ Keypoints (COCO): nose=0, left_ear=3, right_ear=4, left_wrist=9, right_wrist=10
 - **requirements.txt incomplete** — declares only `ultralytics` + `opencv-python`. ResNet branch uses `torch` + `torchvision` (installed in `.venv` but undeclared).
 - **EMOTIONEN order mismatch** — `ImageFolder` sorts folder names alphabetically (`angry=0, ..., neutral=4, ..., surprise=6`). FER-2013 training used a different mapping. Fix the `EMOTIONEN` list in `spatial_analysis/model_resnet.py` after merge.
 - **head-velocity-tracking import bug** — `main.py` does `from model_yolo import MovementAnalyzer, GestureAnalyzer` but those live in separate files.
-- **No test/lint/typecheck** — only `pyright --basic`. No CI, no pre-commit.
+- **No test/lint/typecheck** — only `pyright --basic` (not installed). No CI, no pre-commit.
+- **FaceProcessor** — Crop ist quadratisch (Kopfbreite × 1.6, zentriert auf Nase). Fallback über Ohren-Cofidence. Min 40px.
 - **Activate `.venv/` first** — system python lacks torch.
 
 ## Commands
