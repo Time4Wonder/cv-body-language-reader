@@ -26,7 +26,7 @@ def main():
     # 1. Initialisierung der Komponenten
     pose_estimator = PoseEstimator()
     face_processor = FaceProcessor()
-    emotion_analyzer = ExpressionAnalyzer(model_path="models/resnet_fer2013v3.pth")
+    emotion_analyzer = ExpressionAnalyzer(model_path="models/resnet_fer2013.pth")
     temporal_tracker = TemporalTracker()
     temporal_aggregator = TemporalAggregator(window_seconds=10.0)
     relative_motion = RelativeMotionAnalyzer()
