@@ -1,5 +1,9 @@
-import cv2
+import time
 import json
+from collections import deque
+
+import numpy as np
+import cv2
 from tracking_features.model_yolo import PoseEstimator
 from tracking_features.face_processor import FaceProcessor
 from spatial_analysis.model_resnet import ExpressionAnalyzer
@@ -11,6 +15,7 @@ from output.behavior_interpreter import BehaviorInterpreter
 
 # 7 Emotionen aus FER-2013
 EMOTIONEN = ["angry", "disgust", "fear", "happy", "neutral", "sad", "surprise"]
+BUFFER_SECONDS = 5.0  # Zeitfenster für rolling average
 
 
 def main():
@@ -31,6 +36,7 @@ def main():
 
     image_size_set = False  # Bildgröße erst nach dem ersten Frame bekannt
     behavior_speeds = []    # rel_speed-Werte für Session-Report
+    history = deque()       # Rolling Buffer (timestamp, emotion_probs, rel_speed)
 
     print("Programm gestartet. Drücke 'q' zum Beenden.")
 
@@ -81,7 +87,21 @@ def main():
         rel_speed = relative_motion.compute(motion_state, keypoints)
 
         behavior_result = behavior_interpreter.interpret(emotion_probs, rel_speed)
-        behavior_canvas = behavior_interpreter.render_canvas(behavior_result)
+
+        # 8. Rolling 5s-Durchschnitt
+        now = time.time()
+        history.append((now, emotion_probs, rel_speed))
+        while history and now - history[0][0] > BUFFER_SECONDS:
+            history.popleft()
+
+        if len(history) > 0:
+            avg_probs = np.mean([h[1] for h in history], axis=0).tolist()
+            avg_speed = float(np.mean([h[2] for h in history]))
+            avg_result = behavior_interpreter.interpret(avg_probs, avg_speed)
+        else:
+            avg_result = None
+
+        behavior_canvas = behavior_interpreter.render_canvas(behavior_result, avg_result)
 
         behavior_speeds.append(rel_speed)
         temporal_aggregator.add_frame(emotion_probs, rel_speed)
@@ -113,13 +133,21 @@ def main():
         print("\n=== Zusammenfassung der Session ===")
         print(f"Dauer: {session['duration_s']}s, Frames: {session['n_frames']}")
         print(f"Dominante Emotion: {session['dominant_emotion']}")
-        print("Scores pro Emotion [0,1]:")
-        print(json.dumps(session["emotion_scores"], indent=2))
-        print(f"Bewegung (roh): {session['motion']['speed_raw']} px/frame")
+
         avg_speed = sum(behavior_speeds) / len(behavior_speeds) if behavior_speeds else 0
         avg_probs = [session["emotion_scores"][e] for e in EMOTIONEN]
+
+        print("\n─── Emotions-Scores [0,1] ───")
+        for i, emotion in enumerate(EMOTIONEN):
+            score = session["emotion_scores"][emotion]
+            bar = "█" * int(score * 20) + "░" * (20 - int(score * 20))
+            print(f"  {emotion:10s} |{bar}| {score:.2f}")
+
+        print(f"\n  Bewegung (roh): {session['motion']['speed_raw']:.3f} px/frame")
+        print(f"  Bewegung (norm): {session['motion']['speed_norm']:.2f}")
+
         session_behavior = behavior_interpreter.interpret(avg_probs, avg_speed)
-        print(f"Dominantes Verhalten: {session_behavior['label']}")
+        print(f"\n  Session-Interpretation: {session_behavior['label']}")
     else:
         print("\nKeine Daten aufgezeichnet.")
 
