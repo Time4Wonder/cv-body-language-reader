@@ -2,8 +2,7 @@
 
 Ein Computer-Vision-Projekt zur echtzeitfähigen Auslesung und Prognose von Mimik und Gestik. Entwickelt im Rahmen einer Projektarbeit an der Technischen Hochschule Deggendorf (THD).
 
-<video src="./assets/body-ln-reader_demo.mov controls autoplay loop muted style="max-width: 100%;">
-</video>
+[![Demo Video](https://img.youtube.com/vi/Emt20UvHRZ4/0.jpg)](https://youtu.be/Emt20UvHRZ4)
 
 ## Projektbeschreibung
 Dieses Projekt zielt darauf ab, menschliche Körpersprache nicht nur starr in Basisemotionen zu klassifizieren, sondern durch eine tiefere Analyse von Mimik und Gestik komplexe psychologische Zustände und fließende Emotionen abzubilden. 
