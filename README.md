@@ -2,7 +2,7 @@
 
 Ein Computer-Vision-Projekt zur echtzeitfähigen Auslesung und Prognose von Mimik und Gestik. Entwickelt im Rahmen einer Projektarbeit an der Technischen Hochschule Deggendorf (THD).
 
-<video src="./assets/dein-video.mp4" controls autoplay loop muted style="max-width: 100%;">
+<video src="./assets/body-ln-reader_demo.mov controls autoplay loop muted style="max-width: 100%;">
 </video>
 
 ## Projektbeschreibung
