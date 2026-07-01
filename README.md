@@ -53,6 +53,45 @@ python src/main.py
 **Steuerung:**
 - `q` – Beenden + Session-Report anzeigen
 
+## Training
+
+Das ResNet-Modell kann auf **FER-2013** selbst trainiert werden.
+
+### Datensatz vorbereiten
+
+FER-2013 (`fer2013.csv`) herunterladen und entpacken:
+
+```
+data/raw/
+├── train/
+│   ├── angry/
+│   ├── disgust/
+│   ├── fear/
+│   ├── happy/
+│   ├── neutral/
+│   ├── sad/
+│   └── surprise/
+└── test/
+    └── (gleiche Klassen)
+```
+
+### Training starten
+
+```bash
+source .venv/bin/activate
+python src/spatial_analysis/train.py
+```
+
+Das trainierte Modell wird automatisch unter `models/resnet_fer2013.pth` gespeichert und von `src/main.py` geladen.
+
+### Eigenes Modell verwenden
+
+In `src/main.py:29` den Pfad anpassen:
+
+```python
+emotion_analyzer = ExpressionAnalyzer(model_path="models/mein_modell.pth")
+```
+
 ## Modell-Performance
 
 Trainiert auf **FER-2013** (7 Klassen, 35.887 Graustufenbilder, 48×48 Pixel):
