@@ -32,6 +32,7 @@ data/processed/
 *.png
 *.mp4
 *.avi
+*.mov
 
 # PyTorch Modell-Gewichte und Checkpoints
 models/
